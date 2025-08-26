@@ -15,7 +15,7 @@ spec:
         app: reactapp
   spec:
     containers:
-      - name: 977con
+      - name: 977container
         image: murtaza0318/977fitnessapp:latest
         ports:
           - containerPort: 5173
