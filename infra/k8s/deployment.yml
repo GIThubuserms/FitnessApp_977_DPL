@@ -1,23 +1,20 @@
-kind: Deployment
 apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: 977dpl
+  name: react-deployment         # must start with a letter
   namespace: 977ns
 spec:
   replicas: 1
   selector:
-    matchLabel: 
+    matchLabels:                 # <-- fixed (plural)
       app: reactapp
   template:
     metadata:
-      name: 977pod
-      labels:
+      labels:                    # <-- use labels, not name
         app: reactapp
-  spec:
-    containers:
-      - name: 977container
-        image: murtaza0318/977fitnessapp:latest
-        ports:
-          - containerPort: 5173
-
-  
+    spec:
+      containers:
+        - name: react-container  # must start with a letter
+          image: murtaza0318/977fitnessapp:latest
+          ports:
+            - containerPort: 5173
