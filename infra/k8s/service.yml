@@ -1,5 +1,5 @@
 kind: Service
-apiVersion:
+apiVersion: v1
 metadata:
   name: 977svc
   namespace: 977ns
