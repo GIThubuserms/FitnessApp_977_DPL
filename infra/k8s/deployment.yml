@@ -1,0 +1,23 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: 977dpl
+  namespace: 977ns
+spec:
+  replicas: 1
+  selector:
+    matchLabel: 
+      app: reactapp
+  template:
+    metadata:
+      name: 977pod
+      labels:
+        app: reactapp
+  spec:
+    containers:
+      - name: 977con
+        image: murtaza0318/977fitnessapp:latest
+        ports:
+          - containerPort: 5173
+
+  
