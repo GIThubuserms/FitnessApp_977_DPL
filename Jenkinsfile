@@ -1,50 +1,57 @@
-pipeline{
+@Library('sharedLIB') _
+
+pipeline {
     agent any
 
-    stages{
-        stage("Clone code"){
-            steps{
-                git: "https://github.com/GIThubuserms/FitnessApp_977_DPL.git",branch:"master"
+    environment {
+        DOCKER_IMAGE = "murtaza0318/977fitnessapp"
+        DOCKER_TAG   = "latest"
+        DOCKER_CREDS = "DockerHubCred"  
+    }
+
+    stages {
+        stage("Clone code") {
+            steps {
+                git branch: 'master', url: 'https://github.com/GIThubuserms/FitnessApp_977_DPL.git'
             }
         }
-        stage("Build dockerimage"){
-            steps{
-               sh: "docker built -it murtaza0318/977fitnessapp ."
+
+        stage("Build docker image") {
+            steps {
+                sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
             }
         }
-        stage("Push To dockerHub"){
-            steps{
-               sh: "docker push murtaza0318/977fitnessapp:latest"
+
+        stage("Login to DockerHub") {
+            steps {
+                script {
+                    dockerpush(env.DOCKER_CREDS) 
+                }
             }
         }
-        stage("Run Kind cluster"){
-            steps{
-                sh: "kind create cluster --name=mycluster"
+
+        stage("Push to DockerHub") {
+            steps {
+                sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
             }
         }
-        stage("Make namespace"){
-            steps{
-                sh:"kubectl create namespace 977ns"
+
+        stage("Apply Kubernetes Manifests") {
+            steps {
+                sh """
+                    # make sure namespace exists
+                    kubectl get ns 977ns || kubectl create ns 977ns
+                    
+                    # apply all manifests from infra/k8s
+                    kubectl apply -n 977ns -f infra/k8s/
+                """
             }
         }
-        stage("Run K8s manifest"){
-            steps{
-                dir('infra/k8s'){
-                sh: "kubectl apply -f . -n 977ns"
-               }
+
+        stage("Success") {
+            steps {
+                echo "Successfully achieved CI/CD of 977fitnessapp 🚀"
             }
         }
-        stage("Make svc available"){
-            steps{
-             sh "kubectl port-forward svc/977svc -n 977ns 8082:8081 --address=0.0.0.0/0 &"
-            }
-        }
-        stage("Success"){
-            steps{
-               echo: "Suucessfully achived CI of 977fitnessapp"
-            }
-        }
-        
-        
     }
 }
